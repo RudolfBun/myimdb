@@ -1,0 +1,21 @@
+.with-toolbar-content{
+  height: 95%;
+}
+
+.sidenav-list {
+  user-select: none;
+}
+
+.no-toolbar-content{
+  height: 100%;
+}
+
+.background-img{
+  background-image:linear-gradient(to bottom, rgba(0,0,0,0.0005) 20%,rgba(0,0,0,0.1) 100%), url('../assets/backround.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  overflow-x: auto;
+  height: 100%;
+}

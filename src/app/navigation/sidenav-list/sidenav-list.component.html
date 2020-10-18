@@ -1,0 +1,23 @@
+
+<mat-nav-list>
+  <a mat-list-item routerLink="/home">
+    <span class="full-width" *ngIf="isExpanded">Home</span>
+    <mat-icon mat-list-icon>home</mat-icon>
+  </a>
+  <a mat-list-item routerLink="/favorites">
+    <span class="full-width" *ngIf="isExpanded">Favorites</span>
+    <mat-icon mat-list-icon>grade</mat-icon>
+  </a>
+  <a mat-list-item routerLink="/alreadyseen">
+    <span class="full-width" *ngIf="isExpanded">Already seen</span>
+    <mat-icon mat-list-icon>visibility</mat-icon>
+  </a>
+  <a mat-list-item routerLink="/watchlist">
+    <span class="full-width" *ngIf="isExpanded">Watchlist</span>
+    <mat-icon mat-list-icon>bookmark</mat-icon>
+  </a>
+  <a mat-list-item (click)="logout()" >
+    <span class="full-width" *ngIf="isExpanded">Logout</span>
+    <mat-icon mat-list-icon>exit_to_app</mat-icon>
+  </a>
+</mat-nav-list>

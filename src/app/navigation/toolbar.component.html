@@ -1,0 +1,13 @@
+<mat-toolbar color="primary" class="header-toolbar">
+	<button mat-icon-button (click)="onToggleSidenav()">
+			<ng-container *ngIf="isExpanded; else showListIcon">
+				<mat-icon>menu</mat-icon>
+			</ng-container >
+			<ng-template #showListIcon>
+				<mat-icon>list</mat-icon>
+			</ng-template>
+	</button>
+	<h1 class="header-title">{{title}}</h1>
+</mat-toolbar>
+
+

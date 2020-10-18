@@ -1,0 +1,18 @@
+
+<div class="typewriter header-title">
+  <h1 class="search-title" >Search.Find.Remind.</h1>
+  <div class="explonation-container">
+    <p>Start to type and select <mat-chip>category</mat-chip>, which you want to search in.</p>
+    <p>Type <mat-chip>year</mat-chip>, you want to search for a movie.</p>
+    <p>Type the title, if you want to find a movie.</p>
+  </div>
+</div>
+<app-search-bar (searchResult)="search($event)"></app-search-bar>
+
+<div fxLayout="column" fxLayoutAlign="space-around center" 
+  *ngFor="let movie of (movies$ | async)" >
+  <ng-container *ngIf="movie">
+    <app-movie-card [movie]="movie"></app-movie-card>
+  </ng-container>
+</div>
+

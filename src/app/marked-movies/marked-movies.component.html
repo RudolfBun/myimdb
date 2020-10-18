@@ -1,0 +1,16 @@
+<div class="typewriter header-title">
+  <h1 class="title" >{{title}}</h1>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="1vw" style="margin: 8vh 0;">  
+  <mat-form-field  style="width: 50%;" appearance="outline">
+    <input matInput placeholder="Filter by title..." [formControl]="filterForm">
+  </mat-form-field>
+  <button type="submit" class="btn-arround-margin" mat-raised-button color="primary" (click)="filterMovies()">Search</button>
+</div>
+<div fxLayout="column" fxLayoutAlign="space-around center" 
+  *ngFor="let movie of (movies$ | async)" >
+  <ng-container *ngIf="movie">
+    <app-movie-card [movie]="movie"></app-movie-card>
+  </ng-container>
+</div>

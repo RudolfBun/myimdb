@@ -1,0 +1,38 @@
+.this-feels-better{
+  padding-bottom: 0;
+}
+::ng-deep .mat-form-field-wrapper{
+  padding-bottom: 0;
+}
+
+.title{
+  width: 80%;
+  font-size:7vw;
+  font-weight: bold;
+  text-align: center;
+}
+
+.header-title{
+  margin-top: 3vw;
+  margin-bottom: 5vw;
+}
+
+.typewriter h1 {
+  line-height: normal;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0 auto;
+  animation: 
+    typing 3s steps(40, end),
+    blinking-cursor .2s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 10% }
+  to { width: 80% }
+}
+
+@keyframes blinking-cursor {
+  from, to { border-color: transparent }
+  100% { border-color: red; }
+}
