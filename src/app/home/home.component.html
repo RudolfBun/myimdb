@@ -9,7 +9,7 @@
 </div>
 <app-search-bar (searchResult)="search($event)"></app-search-bar>
 
-<div fxLayout="column" fxLayoutAlign="space-around center" 
+<div *ngIf="movies$" fxLayout="column" fxLayoutAlign="space-around center" 
   *ngFor="let movie of (movies$ | async)" >
   <ng-container *ngIf="movie">
     <app-movie-card [movie]="movie"></app-movie-card>

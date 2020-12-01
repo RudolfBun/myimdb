@@ -8,13 +8,13 @@ import { RouteStrings } from 'src/app/utils/route-strings';
   templateUrl: './sidenav-list.component.html',
   styleUrls: ['./sidenav-list.component.css'],
 })
-export class SideNavListComponent implements OnInit {
+export class SideNavListComponent {
   @Input() isExpanded: boolean;
+
   constructor(private authService: AuthService, private router: Router) {}
 
-  public logout() {
+  public logout(): void {
     this.authService.logout();
     this.router.navigate([RouteStrings.LOGIN]);
   }
-  ngOnInit(): void {}
 }

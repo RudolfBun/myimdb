@@ -7,15 +7,17 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./toolbar.component.css'],
 })
 export class ToolbarComponent implements OnInit {
-  @Input() isExpanded: boolean;
-  @Input() title: string;
-  @Output() sidenavToggle = new EventEmitter<void>();
+  @Input() public isExpanded: boolean;
+  @Input() public title: string;
+  @Output() public sidenavToggle = new EventEmitter<void>();
+
   constructor(public authService: AuthService) {}
-  ngOnInit(): void {
+
+  public ngOnInit(): void {
     this.authService.isAuth();
   }
 
-  onToggleSidenav() {
+  public onToggleSidenav(): void {
     this.sidenavToggle.emit();
   }
 }

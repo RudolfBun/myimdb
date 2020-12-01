@@ -10,20 +10,15 @@ import { Subscription, Observable, Subject } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   public movies: Movie[];
   public movies$: Observable<Movie[]>;
 
-  constructor(
-    private movieService: MovieService,
-    private storageService: StorageService
-  ) {
+  constructor(private movieService: MovieService) {
     this.movies$ = this.movieService.getTopRatedMovies();
   }
 
-  ngOnInit(): void {}
-
-  search(result: SearchResult) {
+  public search(result: SearchResult): void {
     this.movies$ = this.movieService.searchMovies(result);
   }
 }

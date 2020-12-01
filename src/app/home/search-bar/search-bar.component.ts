@@ -25,7 +25,7 @@ import { Category } from 'src/app/models/movie';
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css'],
 })
-export class SearchBarComponent implements OnInit, OnDestroy {
+export class SearchBarComponent implements OnDestroy {
   private readonly PLACEHORDER_BEFORE = 'options | title';
   private readonly YEAR = 'year | title';
   private readonly CATEGORY = 'category | title';
@@ -45,11 +45,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   public allOptions: string[] = [];
   private allCategory: Category[];
 
-  oprionsSubscription: Subscription;
+  private oprionsSubscription: Subscription;
 
-  @Output() searchResult = new EventEmitter<SearchResult>();
-  @ViewChild('movieInput') movieInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  @Output() public searchResult = new EventEmitter<SearchResult>();
+  @ViewChild('movieInput') public movieInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') public matAutocomplete: MatAutocomplete;
 
   constructor(private movieService: MovieService) {
     this.oprionsSubscription = this.movieService
@@ -72,13 +72,12 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       )
     );
   }
-  ngOnDestroy(): void {
-    this.oprionsSubscription.unsubscribe();
+
+  public ngOnDestroy(): void {
+    this.oprionsSubscription?.unsubscribe();
   }
 
-  ngOnInit() {}
-
-  add(event: MatChipInputEvent): void {
+  public add(event: MatChipInputEvent): void {
     const input = event.input;
     const value = event.value;
 
@@ -92,7 +91,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.setPlaceholder();
     this.movieFormControl.setValue(null);
   }
-  setPlaceholder() {
+
+  private setPlaceholder(): void {
     if (this.year && this.options.length === 2) {
       this.inputPlaceholder = this.TITLE;
     } else if (
@@ -112,7 +112,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  remove(options: string): void {
+  public remove(options: string): void {
     const index = this.options.indexOf(options);
 
     if (index >= 0) {
@@ -124,7 +124,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.setPlaceholder();
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  public selected(event: MatAutocompleteSelectedEvent): void {
     this.options.push(event.option.viewValue);
     this.movieInput.nativeElement.value = '';
     this.movieFormControl.setValue(null);

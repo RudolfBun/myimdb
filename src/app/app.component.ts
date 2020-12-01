@@ -7,8 +7,8 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'MyImdb';
-  isExpanded = false;
+  public title = 'MyImdb';
+  public isExpanded = false;
 
   constructor(public authService: AuthService) {}
 
