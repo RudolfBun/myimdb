@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Movie } from 'src/app/models/movie';
+import { Cast, Movie } from 'src/app/models/movie';
 import { ApiUrlStrings } from 'src/app/utils/api-url-strings';
 import { MovieService } from 'src/app/services/movie.service';
 import {
@@ -125,5 +125,11 @@ export class MovieCardComponent implements OnInit, OnDestroy {
     } else {
       this.storageService.removeFromWatchlist(this.movie);
     }
+  }
+
+  public getActorsDependsOnWindowSize(): Cast[] {
+    return window.innerWidth < 500
+      ? this.movie.characters.slice(0, 2)
+      : this.movie.characters;
   }
 }

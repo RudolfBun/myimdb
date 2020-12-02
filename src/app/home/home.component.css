@@ -37,3 +37,10 @@
 .explonation-container p {
   margin: 0;
 }
+
+.movie-wrapper{
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}

@@ -1,34 +1,38 @@
 .card-container{
-  min-width: 725px;
-  min-height: 200px;
-  max-width: 88%;
-  width: 75vw;
-  height: 40vh;
+  width: 800px;
   margin: 5vh auto;
 }
 
 .rating-containter{
-  height: 10%;
-  width: 5%;
+  flex: 0 0 auto
 }
-.rating-containter p{
-  margin: 0 0.5vw 0 0;
+
+.title-text{
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: x-large;
+  line-height: 2rem;
 }
 
 .image{
   width: auto;
   height: 100%;
+  max-width: 185px;
+  max-height: 278px;
+  object-fit: cover;
 }
 
 .title{
-  width: 90%;
-  text-align: center;
-  padding-left: 10%;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
-.description{
-  width: 50%;
-  height: 100%;
+.actions{
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
 }
 
 .actors{
@@ -51,11 +55,10 @@ p {
 }
 
 .card-header{
-  height: 10%;
-  padding: 2vh 2vw;
-  font-size:calc(18px + 0.7vw);
+  height: 3rem;
+  padding: 2rem 1rem;
   font-weight:bold;
-
+  font-size: x-large;
 }
 
 .card-header p{
@@ -64,7 +67,10 @@ p {
 }
 
 .card-body{
-  height: 90%;;
+  justify-content: space-between;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
 }
 
 .actors p{
@@ -72,20 +78,129 @@ p {
 }
 
 .details{
-  height: 75%;
-  min-width: 350px;
   display: flex;
   align-items: center;
-}
-
-.big-text{
-  overflow: auto;
-  flex-wrap: wrap;
-  overflow-x: hidden;
+  justify-content: center;
 }
 
 .category-container{
   flex-wrap: wrap;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
 }
 
+.details-text{
+  width: 350px;
+  height: 200px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 10;
+  overflow: hidden;
+  line-height: 20px;
+  padding: 4px 4px 4px 10px;
+}
+.main-container{
+  display: flex;
+}
 
+@media screen and (max-width: 920px) {
+  .card-body {
+    flex-direction: column;
+  }
+
+  .card-container{
+    width: 580px;
+    margin: 5vh auto;
+  }
+  .actors-wrapper{
+    display: flex;
+    justify-content: space-around;
+  }
+  .actors{
+    margin-top: 0.5rem;
+  }
+  .actor-name-wrapper{
+    margin: 0 0.5rem;
+  }
+  .actions{
+    flex-direction: row;
+    width: 100%;
+  }
+}
+@media screen and (max-width: 620px) {
+  .card-container{
+    width: 450px;
+  }
+  .details-text{
+    height: 100px;
+    -webkit-line-clamp: 5;
+    padding: 10px 4px 4px 4px;
+    margin-bottom: 10px;
+  }
+  .main-container{
+    align-items: center;
+    flex-direction: column;
+  } 
+}
+@media screen and (max-width: 500px) {
+  .card-container{
+    width: 350px;
+  }
+  .card-body{
+    flex-direction: row;
+  }
+  .details-text{
+    display: none;
+  }
+
+  .actors-wrapper{
+    display: block;
+  }
+  .actions{
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    width: min-content;
+  }
+  .card-header{
+    height: 2rem;
+    padding: 1rem 0rem;
+    font-size: larger;
+  }
+  .title-text{
+    font-size: large;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .card-container{
+    width: 260px;
+  }
+
+  .details-text{
+    display: none;
+  }
+  .actors{
+    display: none;
+  }
+
+  .actions{
+    flex-direction: row;
+  }
+  .card-body{
+    flex-direction: column;
+  } 
+  .card-header{
+    font-size: medium;
+  }
+  .title-text{
+    font-size: medium;
+  }
+  ::ng-deep mat-card{
+    padding: 6px !important;
+  }
+}

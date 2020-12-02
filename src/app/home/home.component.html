@@ -8,11 +8,12 @@
   </div>
 </div>
 <app-search-bar (searchResult)="search($event)"></app-search-bar>
-
-<div *ngIf="movies$" fxLayout="column" fxLayoutAlign="space-around center" 
-  *ngFor="let movie of (movies$ | async)" >
-  <ng-container *ngIf="movie">
-    <app-movie-card [movie]="movie"></app-movie-card>
-  </ng-container>
-</div>
+<ng-container *ngIf="movies$">
+  <div class="movie-wrapper"
+    *ngFor="let movie of (movies$ | async)" >
+    <ng-container *ngIf="movie">
+      <app-movie-card [movie]="movie"></app-movie-card>
+    </ng-container>
+  </div>
+</ng-container>
 
