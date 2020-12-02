@@ -1,8 +1,10 @@
 <ng-container *ngIf="authService.isAuth()">
-<app-toolbar [isExpanded]="isExpanded" [title]="title" (sidenavToggle)="toggleExpanded()"></app-toolbar>
+  <app-toolbar [isExpanded]="isExpanded" [title]="title" (sidenavToggle)="toggleExpanded()"></app-toolbar>
 </ng-container>
 <mat-sidenav-container [ngClass]="authService.isAuth() ? 'with-toolbar-content' : 'no-toolbar-content'" autosize>
-  <mat-sidenav *ngIf="authService.isAuth()" #sidenav role="navigation" class="sidenav-list" mode="side" opened="true" >
+  <mat-sidenav *ngIf="authService.isAuth()" #sidenav (openedChange)="setToogleState($event)" role="navigation" class="sidenav-list" 
+    [mode]="isSmallScreen ? 'over': 'side'"
+    [opened]="isSmallScreen ? isExpanded : 'true'" >
     <app-sidenav-list [isExpanded]="isExpanded" (closeSidenav)="sidenav.close()"></app-sidenav-list>
   </mat-sidenav>
   <mat-sidenav-content>
