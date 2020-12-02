@@ -1,31 +1,32 @@
 <div class="page-container bg-image">
-
-  <mat-card class="login-form-containter">
-      <div class="form-content">
-        <div class="app-title">
-          {{appTitle}}
+  <div class="login-wrapper">
+    <mat-card class="login-form-containter">
+        <div class="form-content">
+          <div class="app-title">
+            {{appTitle}}
+          </div>
+          <form [formGroup]="loginForm">
+              <div class="full-width">
+                  <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Username</mat-label>
+                      <input class="setText-center" matInput type="text" formControlName="username">
+                  </mat-form-field>
+              </div>
+              <div class="full-width">
+                  <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Password</mat-label>
+                      <input class="setText-center" matInput type="password"
+                          formControlName="password">
+                  </mat-form-field>
+              </div>
+              <div *ngIf="!isValid" class="error">
+                Username or password is invalid!
+              </div>
+              <button type="submit" class="full-width btn-bottom-margin" mat-raised-button color="primary" (click)="submit()">Login</button>
+          </form>
         </div>
-        <form [formGroup]="loginForm">
-            <div class="full-width">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Username</mat-label>
-                    <input class="setText-center" matInput type="text" formControlName="username">
-                </mat-form-field>
-            </div>
-            <div class="full-width">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Password</mat-label>
-                    <input class="setText-center" matInput type="password" 
-                        formControlName="password">
-                </mat-form-field>
-            </div>
-            <div *ngIf="!isValid" class="error">
-              Username or password is invalid!
-            </div>
-            <button type="submit" class="full-width btn-bottom-margin" mat-raised-button color="primary" (click)="submit()">Login</button>
-        </form>
-      </div>
-  </mat-card>
+    </mat-card>
+  </div>
 
 </div>
 

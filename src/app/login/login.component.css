@@ -12,8 +12,6 @@
 }
 
 .login-form-containter{
-  height: auto;
-  width: 40%;
   opacity: 0.8;
   display: flex;
   justify-content: center;
@@ -44,8 +42,14 @@
 .app-title{
   padding: 20% 0 30% 0;
   width: 100%;
-  font-size:7vw;
+  font-size: 9vw;
+  font-weight: 600;
   text-align: center;
+}
+
+.login-wrapper{
+  width: 50%;
+  max-width: 800px;
 }
 
 .form-content{
@@ -64,4 +68,17 @@
 
 .btn-bottom-margin{
   margin-bottom: 10%;
+}
+
+@media screen and (max-width: 650px) {
+  .login-wrapper {
+    width: 65%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .login-wrapper {
+    width: 260px;
+    margin: 0 1rem;
+  }
 }
