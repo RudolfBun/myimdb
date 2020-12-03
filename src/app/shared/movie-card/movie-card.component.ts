@@ -79,8 +79,9 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   }
 
   public changeFavorite() {
+    const snackText =  this.movie.favorite ? 'You removed the movie from the list!' : 'You added the movie to your favorites!';
     this.snackBar.open(
-      'You added the movie to your favorites!',
+      snackText,
       this.snackBarAction,
       {
         duration: 2000,
@@ -95,15 +96,15 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   }
 
   public changeAlreadySeen() {
+    const snackText =  this.movie.alreadySeen ? 'You removed the movie from the list!' : 'You marked the movie as already seen!';
     this.snackBar.open(
-      'You marked the movie as already seen!',
+      snackText,
       this.snackBarAction,
       {
         duration: 2000,
       }
     );
     this.movie.alreadySeen = !this.movie.alreadySeen;
-    console.log(this.movie.alreadySeen);
     if (this.movie.alreadySeen) {
       this.storageService.addAlreadySeen(this.movie);
     } else {
@@ -112,8 +113,9 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   }
 
   public changeWatchList() {
+    const snackText =  this.movie.watchlist ? 'You removed the movie from the list!' : 'You added the movie on your watchlist!';
     this.snackBar.open(
-      'You added the movie on your watchlist!',
+      snackText,
       this.snackBarAction,
       {
         duration: 2000,

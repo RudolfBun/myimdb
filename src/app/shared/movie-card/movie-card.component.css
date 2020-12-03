@@ -22,6 +22,7 @@
   max-width: 185px;
   max-height: 278px;
   object-fit: cover;
+  border-radius: 10px;
 }
 
 .title{
@@ -36,7 +37,6 @@
 }
 
 .actors{
-  /*width: 20%;*/
   height: 100%;
 }
 
