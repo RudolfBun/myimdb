@@ -13,7 +13,7 @@ import {
 } from '@angular/material/autocomplete';
 import { FormControl } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { isEmpty, map, startWith, switchMap } from 'rxjs/operators';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { SearchResult } from 'src/app/models/search-result';
@@ -35,9 +35,9 @@ export class SearchBarComponent implements OnDestroy {
   private year: boolean;
   private yearRegExp: RegExp;
 
-  public selectable = true;
+  public selectable = false;
   public removable = true;
-  public separatorKeysCodes: number[] = [ENTER, COMMA];
+  public separatorKeysCodes: number[] = [ENTER];
   public movieFormControl = new FormControl();
   public filteredOptions: Observable<string[]>;
   public inputPlaceholder: string;
@@ -65,10 +65,9 @@ export class SearchBarComponent implements OnDestroy {
     this.inputPlaceholder = this.PLACEHORDER_BEFORE;
 
     this.filteredOptions = this.movieFormControl.valueChanges.pipe(
-      // tslint:disable-next-line: deprecation
       startWith(null),
-      map((fruit: string | null) =>
-        fruit ? this.filterOut(fruit) : this.allOptions.slice()
+      map((option: string | null) =>
+        option ? this.filterOut(option) : this.allOptions.slice()
       )
     );
   }
@@ -81,15 +80,22 @@ export class SearchBarComponent implements OnDestroy {
     const input = event.input;
     const value = event.value;
 
-    if (this.allOptions.includes(value)) {
-      this.options.push(value.trim());
-    } else if (this.checkInputIsAYear(value) && !this.year) {
-      this.year = true;
-      this.options.push(value.trim());
+    if (value !== '') {
+      if (this.allOptions.includes(value)) {
+        this.options.push(value.trim());
+        input.value = '';
+        this.setPlaceholder();
+        this.movieFormControl.setValue(null);
+      } else if (this.checkInputIsAYear(value) && !this.year) {
+        this.year = true;
+        this.options.push(value.trim());
+        input.value = '';
+        this.setPlaceholder();
+        this.movieFormControl.setValue(null);
+      } else {
+        this.sendSearchResult();
+      }
     }
-    input.value = '';
-    this.setPlaceholder();
-    this.movieFormControl.setValue(null);
   }
 
   private setPlaceholder(): void {
