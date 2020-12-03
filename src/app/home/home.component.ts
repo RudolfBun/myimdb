@@ -4,6 +4,7 @@ import { MovieService } from '../services/movie.service';
 import { Movie } from '../models/movie';
 import { StorageService } from '../services/storage.service';
 import { Subscription, Observable, Subject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ export class HomeComponent {
   public movies$: Observable<Movie[]>;
 
   constructor(private movieService: MovieService) {
-    this.movies$ = this.movieService.getTopRatedMovies();
+    this.movies$ = this.movieService.topRatedMovies$;
   }
 
   public search(result: SearchResult): void {

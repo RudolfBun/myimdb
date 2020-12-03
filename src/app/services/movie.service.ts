@@ -1,45 +1,47 @@
-import { Injectable, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ApiUrlStrings } from '../utils/api-url-strings';
-import { Movie, Cast, Category } from '../models/movie';
-import { SearchResult } from '../models/search-result';
-import _ from 'lodash';
-import { map, switchMap } from 'rxjs/operators';
-import { Observable, combineLatest, forkJoin } from 'rxjs';
-import { StorageService, StoredMovieData } from './storage.service';
+import { Injectable, OnInit } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { ApiUrlStrings } from "../utils/api-url-strings";
+import { Movie, Cast, Category } from "../models/movie";
+import { SearchResult } from "../models/search-result";
+import _ from "lodash";
+import { map, shareReplay, switchMap } from "rxjs/operators";
+import { Observable, combineLatest, forkJoin, of } from "rxjs";
+import { StorageService, StoredMovieData } from "./storage.service";
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class MovieService {
   public allCategory$: Observable<Category[]>;
+  public topRatedMovies$: Observable<Movie[]>;
 
-  private readonly GENRES_KEY_SINGLE = 'genres';
-  private readonly GENRES_KEY_MULTIPLE = 'genre_ids';
-  private readonly CAST_ID = 'cast_id';
-  private readonly ORDER = 'order';
-  private readonly CHARACTER = 'character';
-  private readonly NAME = 'name';
-  private readonly PRFILE_IMG = 'profile_path';
-  private readonly RESULTS = 'results';
-  private readonly CAST = 'cast';
+  private readonly GENRES_KEY_SINGLE = "genres";
+  private readonly GENRES_KEY_MULTIPLE = "genre_ids";
+  private readonly CAST_ID = "cast_id";
+  private readonly ORDER = "order";
+  private readonly CHARACTER = "character";
+  private readonly NAME = "name";
+  private readonly PRFILE_IMG = "profile_path";
+  private readonly RESULTS = "results";
+  private readonly CAST = "cast";
 
   constructor(
     private http: HttpClient,
     private storageService: StorageService
   ) {
-    this.allCategory$ = this.getAllCategory();
+    this.allCategory$ = this.getAllCategory().pipe(shareReplay(1));
+    this.topRatedMovies$ = this.getTopRatedMovies().pipe(shareReplay(1)); //should store into indexDB
   }
 
-  public getTopRatedMovies(): Observable<Movie[]> {
+  private getTopRatedMovies(): Observable<Movie[]> {
     return combineLatest([
       this.allCategory$,
       this.http.get(ApiUrlStrings.GET_TOP_RATED),
     ]).pipe(
-      map(([categories, data]) => {
-        return data[this.RESULTS].map((movie) => {
-          return this.getMoivesFromResultArray(movie, categories, true);
-        });
-      })
+      map(([categories, data]) =>
+        data[this.RESULTS].map((movie) =>
+          this.getMoivesFromResultArray(movie, categories, true)
+        )
+      )
     );
   }
 
@@ -92,7 +94,7 @@ export class MovieService {
   public searchMovies(serach: SearchResult): Observable<Movie[]> {
     const queryString = this.setRequestUrl(serach);
     if (queryString === undefined) {
-      return this.getTopRatedMovies();
+      return this.topRatedMovies$;
     }
 
     return combineLatest([this.allCategory$, this.http.get(queryString)]).pipe(
@@ -182,50 +184,30 @@ export class MovieService {
 
   public getMoiveById(url: string): Observable<Movie> {
     return combineLatest([this.allCategory$, this.http.get(url)]).pipe(
-      map(([categories, movie]) => {
-        return this.getMoivesFromResultArray(movie, categories, false);
-      })
+      map(([categories, movie]) =>
+        this.getMoivesFromResultArray(movie, categories, false)
+      )
     );
   }
 
-  public getAllFavoriteMovies(
+  public getContentRelatedMovies(
     markedMovies$: Observable<StoredMovieData[]>
   ): Observable<Movie[]> {
     return markedMovies$.pipe(
       switchMap((favorites) => {
-        return forkJoin([
-          ...favorites.map((b) => {
-            return this.getMoiveById(
-              ApiUrlStrings.GET_MOVIE_WITHOUT_KEY + b.id + ApiUrlStrings.API_KEY
-            );
-          }),
-        ]);
-      })
-    );
-  }
-  public getAllAlreadySeenMovies(): Observable<Movie[]> {
-    return this.storageService.alreadySeenMovies$.pipe(
-      switchMap((favorites) => {
-        return forkJoin([
-          ...favorites.map((b) => {
-            return this.getMoiveById(
-              ApiUrlStrings.GET_MOVIE_WITHOUT_KEY + b.id + ApiUrlStrings.API_KEY
-            );
-          }),
-        ]);
-      })
-    );
-  }
-  public getAllWatchlistMovies(): Observable<Movie[]> {
-    return this.storageService.moviesOnWatchlist$.pipe(
-      switchMap((favorites) => {
-        return forkJoin([
-          ...favorites.map((b) => {
-            return this.getMoiveById(
-              ApiUrlStrings.GET_MOVIE_WITHOUT_KEY + b.id + ApiUrlStrings.API_KEY
-            );
-          }),
-        ]);
+        if (favorites.length === 0) {
+          return of([]);
+        } else {
+          return forkJoin([
+            ...favorites.map((b) => {
+              return this.getMoiveById(
+                ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
+                  b.id +
+                  ApiUrlStrings.API_KEY
+              );
+            }),
+          ]);
+        }
       })
     );
   }
