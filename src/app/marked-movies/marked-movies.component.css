@@ -36,3 +36,17 @@
   from, to { border-color: transparent }
   100% { border-color: red; }
 }
+
+
+.explonation-container{
+  text-align: center;
+}
+
+.description{
+  display: flex;
+  align-items: center;
+}
+
+.icon{
+  margin-left: 0.5rem;
+}

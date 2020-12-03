@@ -2,15 +2,34 @@
   <h1 class="title" >{{title}}</h1>
 </div>
 
-<div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="1vw" style="margin: 8vh 0;">  
-  <mat-form-field  style="width: 50%;" appearance="outline">
-    <input matInput placeholder="Filter by title..." [formControl]="filterForm">
-  </mat-form-field>
-  <button type="submit" class="btn-arround-margin" mat-raised-button color="primary" (click)="filterMovies()">Search</button>
-</div>
-<div fxLayout="column" fxLayoutAlign="space-around center" 
-  *ngFor="let movie of (movies$ | async)" >
-  <ng-container *ngIf="movie">
-    <app-movie-card [movie]="movie"></app-movie-card>
+<ng-container *ngIf="(movies$ | async) as movies" >
+  <ng-container *ngIf="movies.length > 0; else notSelectedContent">
+    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="1vw" style="margin: 8vh 0;">
+      <mat-form-field  style="width: 50%;" appearance="outline">
+        <input matInput placeholder="Filter by title..." [formControl]="filterForm">
+      </mat-form-field>
+      <button type="submit" class="btn-arround-margin" mat-raised-button color="primary" (click)="filterMovies()">Search</button>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="space-around center"
+      *ngFor="let movie of movies" >
+      <ng-container *ngIf="movie">
+        <app-movie-card [movie]="movie"></app-movie-card>
+      </ng-container>
+    </div>
   </ng-container>
-</div>
+  <ng-template #notSelectedContent>
+    <div class="no-result-wrapper">
+      <div class="no-result-container">
+        <p class="no-result-title">There aren't any added movies!</p>
+        <div class="description">
+          <p style="margin:0;">You can add movies on movie's cards by this action button: </p>
+            <ng-container [ngSwitch]="title">
+              <mat-icon *ngSwitchCase="FAV_TITLE" fontSet="material-icons-outlined" class="icon">grade_outline</mat-icon>
+              <mat-icon *ngSwitchCase="SEEN_TITLE" fontSet="material-icons-outlined" class="icon">visibility_outline</mat-icon>
+              <mat-icon *ngSwitchCase="WATCHLIST_TITLE" fontSet="material-icons-outlined" class="icon">bookmark_border</mat-icon>
+            </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ng-container>

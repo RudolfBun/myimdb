@@ -6,7 +6,7 @@ import { StorageService, StoredMovieData } from '../services/storage.service';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouteStrings } from '../utils/route-strings';
-import { map, filter } from 'rxjs/operators';
+import { map, filter, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-marked-movies',
@@ -14,9 +14,9 @@ import { map, filter } from 'rxjs/operators';
   styleUrls: ['./marked-movies.component.css'],
 })
 export class MarkedMoviesComponent implements OnInit {
-  private readonly FAV_TITLE = 'Your favorites.';
-  private readonly SEEN_TITLE = 'Already seen.';
-  private readonly WATCHLIST_TITLE = 'Your desires.';
+  public readonly FAV_TITLE = 'Your favorites.';
+  public readonly SEEN_TITLE = 'Already seen.';
+  public readonly WATCHLIST_TITLE = 'Your desires.';
 
   public movies$: Observable<Movie[]>;
   public filterText = '';
@@ -30,7 +30,7 @@ export class MarkedMoviesComponent implements OnInit {
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.path = this.route.snapshot.url[0].path;
     let content: Observable<StoredMovieData[]>;
     if (this.path === RouteStrings.FAVORITES_PATH_NAME) {
@@ -43,7 +43,7 @@ export class MarkedMoviesComponent implements OnInit {
       this.title = this.SEEN_TITLE;
       content = this.storageService.alreadySeenMovies$;
     }
-    this.movies$ = this.movieService.getAllFavoriteMovies(content);
+    this.movies$ = this.movieService.getContentRelatedMovies(content).pipe( tap(movies => console.log(movies)));
   }
 
   public filterMovies() {
