@@ -50,8 +50,8 @@ export class MovieService {
     this.http
       .get(
         ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
-          id +
-          ApiUrlStrings.GET_CREDITS_PART2
+        id +
+        ApiUrlStrings.GET_CREDITS_PART2
       )
       .subscribe((result) => {
         const characters: [] = result[this.CAST];
@@ -166,13 +166,14 @@ export class MovieService {
       id: movie.id as number,
       title: movie.title as string,
       image: movie.poster_path as string,
+      backImage: movie.backdrop_path as string,
       descreption: movie.overview as string,
       rating: movie.vote_average as number,
       categories: multiple
         ? this.getMovieRelatedCategories(
-            movie[this.GENRES_KEY_MULTIPLE] as number[],
-            genres
-          )
+          movie[this.GENRES_KEY_MULTIPLE] as number[],
+          genres
+        )
         : (movie[this.GENRES_KEY_SINGLE] as Category[]),
       release: movie.release_date as string,
       characters: this.getMovieCharactersById(movie.id as number),
@@ -202,8 +203,8 @@ export class MovieService {
             ...favorites.map((b) => {
               return this.getMoiveById(
                 ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
-                  b.id +
-                  ApiUrlStrings.API_KEY
+                b.id +
+                ApiUrlStrings.API_KEY
               );
             }),
           ]);

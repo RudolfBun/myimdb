@@ -2,6 +2,8 @@ export interface Movie {
   id: number;
   title: string;
   image: string;
+  backImage?: string;
+  video?: string;
   descreption: string;
   rating: number;
   release: string;
