@@ -37,3 +37,8 @@ export interface MovieVideo {
   type: string;
 }
 
+export interface MovieMarker {
+  favorite: boolean;
+  alreadySeen: boolean;
+  onWatchList: boolean;
+}

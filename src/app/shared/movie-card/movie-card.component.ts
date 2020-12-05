@@ -24,9 +24,7 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   public release: string;
   private imageSize = 'w185';
 
-  public favoriteSubscription: Subscription;
-  public alreadySeenSubscription: Subscription;
-  public watchlistSubscription: Subscription;
+  public movieMarkerSubscription: Subscription;
 
   constructor(
     public movieService: MovieService,
@@ -36,9 +34,7 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnDestroy(): void {
-    this.favoriteSubscription.unsubscribe();
-    this.alreadySeenSubscription.unsubscribe();
-    this.watchlistSubscription.unsubscribe();
+    this.movieMarkerSubscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -48,34 +44,12 @@ export class MovieCardComponent implements OnInit, OnDestroy {
       this.imagePath = '../../../assets/not-found.png';
     }
 
-    this.favoriteSubscription = this.storageService
-      .isMovieFavorite(this.movie.id)
-      .subscribe((res) => {
-        if (res) {
-          this.movie.favorite = true;
-        } else {
-          this.movie.favorite = false;
-        }
-      });
-
-    this.alreadySeenSubscription = this.storageService
-      .isMovieAlreadySeen(this.movie.id)
-      .subscribe((res) => {
-        if (res) {
-          this.movie.alreadySeen = true;
-        } else {
-          this.movie.alreadySeen = false;
-        }
-      });
-
-    this.watchlistSubscription = this.storageService
-      .isMovieOnWatchlist(this.movie.id)
-      .subscribe((res) => {
-        if (res) {
-          this.movie.watchlist = true;
-        } else {
-          this.movie.watchlist = false;
-        }
+    this.movieMarkerSubscription = this.storageService
+      .getMovieState(this.movie.id)
+      .subscribe((movieMarker) => {
+        this.movie.favorite = movieMarker.favorite;
+        this.movie.alreadySeen = movieMarker.alreadySeen;
+        this.movie.watchlist = movieMarker.onWatchList;
       });
     this.release = this.movie.release.slice(0, 4);
   }

@@ -5,10 +5,16 @@ import {
   AngularFirestoreCollection,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.model';
-import { Movie } from '../models/movie';
+import { Movie, MovieMarker } from '../models/movie';
 import { AuthService } from './auth.service';
-import { map } from 'rxjs/operators';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import {
+  distinctUntilChanged,
+  map,
+  shareReplay,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
 import { ApiUrlStrings } from '../utils/api-url-strings';
 
 export interface StoredMovieData {
@@ -83,32 +89,20 @@ export class StorageService {
     return this.fireStore.collection(collection).doc(key).delete();
   }
 
-  public isMovieFavorite(id: number): Observable<boolean> {
-    return this.getMovieState(this.COLL_FAVORITES, id);
-  }
-
-  public isMovieAlreadySeen(id: number): Observable<boolean> {
-    return this.getMovieState(this.COLL_ALREADY_SEEN, id);
-  }
-
-  public isMovieOnWatchlist(id: number): Observable<boolean> {
-    return this.getMovieState(this.COLL_WATCHLIST, id);
-  }
-
-  private getMovieState(collection: string, id: number): Observable<boolean> {
-    return this.fireStore
-      .collection(collection)
-      .doc(`${id}`)
-      .valueChanges()
-      .pipe(
-        map((data) => {
-          if (data) {
-            return true;
-          } else {
-            return false;
-          }
-        })
-      );
+  public getMovieState(id: number): Observable<MovieMarker> {
+    return combineLatest([
+      this.favoriteMovies$,
+      this.alreadySeenMovies$,
+      this.moviesOnWatchlist$,
+    ]).pipe(
+      switchMap(([favColl, seenColl, watchColl]) => {
+        const favorite = favColl.some((movie) => movie.id === id);
+        const alreadySeen = seenColl.some((movie) => movie.id === id);
+        const onWatchList = watchColl.some((movie) => movie.id === id);
+        return of({ favorite, alreadySeen, onWatchList } as MovieMarker);
+      }),
+      shareReplay(1)
+    );
   }
 
   private createStoredMovieData(movie: Movie): StoredMovieData {
