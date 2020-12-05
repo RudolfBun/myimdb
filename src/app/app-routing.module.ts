@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { MarkedMoviesComponent } from './marked-movies/marked-movies.component';
 import { AuthGuard } from './guards/auth.guard';
+import { MovieDetailComponent } from './movie-detail/movie-detail.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -27,6 +28,11 @@ const routes: Routes = [
   {
     path: 'logout',
     component: MarkedMoviesComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'movie-details',
+    component: MovieDetailComponent,
     canActivate: [AuthGuard],
   },
 ];

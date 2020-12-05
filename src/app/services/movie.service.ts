@@ -1,35 +1,32 @@
-import { Injectable, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { ApiUrlStrings } from "../utils/api-url-strings";
-import { Movie, Cast, Category } from "../models/movie";
-import { SearchResult } from "../models/search-result";
-import _ from "lodash";
-import { map, shareReplay, switchMap } from "rxjs/operators";
-import { Observable, combineLatest, forkJoin, of } from "rxjs";
-import { StorageService, StoredMovieData } from "./storage.service";
+import { Injectable, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ApiUrlStrings } from '../utils/api-url-strings';
+import { Movie, Cast, Category, MovieVideo } from '../models/movie';
+import { SearchResult } from '../models/search-result';
+import _ from 'lodash';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, forkJoin, of } from 'rxjs';
+import { StorageService, StoredMovieData } from './storage.service';
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class MovieService {
   public allCategory$: Observable<Category[]>;
   public topRatedMovies$: Observable<Movie[]>;
 
-  private readonly GENRES_KEY_SINGLE = "genres";
-  private readonly GENRES_KEY_MULTIPLE = "genre_ids";
-  private readonly CAST_ID = "cast_id";
-  private readonly ORDER = "order";
-  private readonly CHARACTER = "character";
-  private readonly NAME = "name";
-  private readonly PRFILE_IMG = "profile_path";
-  private readonly RESULTS = "results";
-  private readonly CAST = "cast";
+  private readonly GENRES_KEY_SINGLE = 'genres';
+  private readonly GENRES_KEY_MULTIPLE = 'genre_ids';
+  private readonly CAST_ID = 'cast_id';
+  private readonly ORDER = 'order';
+  private readonly CHARACTER = 'character';
+  private readonly NAME = 'name';
+  private readonly PRFILE_IMG = 'profile_path';
+  private readonly RESULTS = 'results';
+  private readonly CAST = 'cast';
 
-  constructor(
-    private http: HttpClient,
-    private storageService: StorageService
-  ) {
+  constructor(private http: HttpClient) {
     this.allCategory$ = this.getAllCategory().pipe(shareReplay(1));
-    this.topRatedMovies$ = this.getTopRatedMovies().pipe(shareReplay(1)); //should store into indexDB
+    this.topRatedMovies$ = this.getTopRatedMovies().pipe(shareReplay(1));
   }
 
   private getTopRatedMovies(): Observable<Movie[]> {
@@ -50,8 +47,8 @@ export class MovieService {
     this.http
       .get(
         ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
-        id +
-        ApiUrlStrings.GET_CREDITS_PART2
+          id +
+          ApiUrlStrings.GET_CREDITS_PART2
       )
       .subscribe((result) => {
         const characters: [] = result[this.CAST];
@@ -167,16 +164,18 @@ export class MovieService {
       title: movie.title as string,
       image: movie.poster_path as string,
       backImage: movie.backdrop_path as string,
-      descreption: movie.overview as string,
+      description: movie.overview as string,
       rating: movie.vote_average as number,
       categories: multiple
         ? this.getMovieRelatedCategories(
-          movie[this.GENRES_KEY_MULTIPLE] as number[],
-          genres
-        )
+            movie[this.GENRES_KEY_MULTIPLE] as number[],
+            genres
+          )
         : (movie[this.GENRES_KEY_SINGLE] as Category[]),
       release: movie.release_date as string,
       characters: this.getMovieCharactersById(movie.id as number),
+      numOfVotes: movie.vote_count,
+      language: movie.original_language,
       favorite: false,
       alreadySeen: false,
       watchlist: false,
@@ -191,6 +190,8 @@ export class MovieService {
     );
   }
 
+  /* Ez ráppipol arra, hogy pl mi van a favoritesben, és lekéri erről az adatokat egyesével */
+  /* Itt meglethetne nézni, hogy az adott film benne van e az idexDB-be ha nincs akkor menjen ki a lekérdezés */
   public getContentRelatedMovies(
     markedMovies$: Observable<StoredMovieData[]>
   ): Observable<Movie[]> {
@@ -203,12 +204,40 @@ export class MovieService {
             ...favorites.map((b) => {
               return this.getMoiveById(
                 ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
-                b.id +
-                ApiUrlStrings.API_KEY
+                  b.id +
+                  ApiUrlStrings.API_KEY
               );
             }),
           ]);
         }
+      })
+    );
+  }
+
+  private getMovieVideos(id: number): Observable<MovieVideo[]> {
+    const url =
+      ApiUrlStrings.GET_VIDEOS_PART_1 + id + ApiUrlStrings.GET_VIDEOS_PART_2;
+    return this.http.get<MovieVideo[]>(url).pipe(
+      map((result) => result['results']),
+      map((videos) =>
+        videos.map(
+          (mv) =>
+            ({
+              id: mv.id,
+              key: mv.key,
+              name: mv.name,
+              site: mv.site,
+              type: mv.type,
+            } as MovieVideo)
+        )
+      )
+    );
+  }
+
+  public extendMovieWithVideoKey(movie: Movie): Observable<Movie> {
+    return this.getMovieVideos(movie.id).pipe(
+      switchMap((videos) => {
+        return of({ ...movie, videos });
       })
     );
   }

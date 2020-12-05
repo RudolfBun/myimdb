@@ -1,0 +1,5 @@
+.actions{
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+}

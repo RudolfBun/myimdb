@@ -23,17 +23,31 @@
   max-height: 278px;
   object-fit: cover;
   border-radius: 10px;
+  cursor: pointer;
+  transition: transform 1s;
+}
+
+.image:hover{
+  transform: scale(1.01);
 }
 
 .title{
   flex: 1 1 auto;
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 1s;
 }
 
 .actions{
   flex-direction: column;
   display: flex;
   justify-content: center;
+}
+
+.title:hover{
+  border-radius: 16px;
+  transition-duration: 1s;
+  transform: skewX(-10deg);
 }
 
 .actors{

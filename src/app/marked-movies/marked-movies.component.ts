@@ -43,7 +43,7 @@ export class MarkedMoviesComponent implements OnInit {
       this.title = this.SEEN_TITLE;
       content = this.storageService.alreadySeenMovies$;
     }
-    this.movies$ = this.movieService.getContentRelatedMovies(content).pipe( tap(movies => console.log(movies)));
+    this.movies$ = this.movieService.getContentRelatedMovies(content);
   }
 
   public filterMovies() {

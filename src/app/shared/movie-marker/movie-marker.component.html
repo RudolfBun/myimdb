@@ -1,0 +1,24 @@
+  <button mat-icon-button (click)="changeFavorite()">
+    <ng-container *ngIf="movie.favorite; else showGrade">
+      <mat-icon color="primary">grade</mat-icon>
+    </ng-container >
+    <ng-template #showGrade>
+      <mat-icon fontSet="material-icons-outlined">grade_outline</mat-icon>
+    </ng-template>
+  </button>
+  <button mat-icon-button (click)="changeAlreadySeen()" >
+    <ng-container *ngIf="movie.alreadySeen; else showEye">
+      <mat-icon color="primary">visibility</mat-icon>
+    </ng-container>
+    <ng-template #showEye>
+      <mat-icon fontSet="material-icons-outlined">visibility_outline</mat-icon>
+    </ng-template>
+  </button>
+  <button mat-icon-button (click)="changeWatchList()">
+    <ng-container *ngIf="movie.watchlist else showBookmark">
+      <mat-icon color="primary">bookmark</mat-icon>
+    </ng-container >
+    <ng-template #showBookmark>
+      <mat-icon>bookmark_border</mat-icon>
+    </ng-template>
+  </button>

@@ -1,0 +1,47 @@
+<div class="content" *ngIf="movie">
+  <div class="background-image" [ngStyle]="{'background-image': backDropImageStyleProperty}">
+    <div class="image-cover">
+      <div class="container">
+        <img class="poster" [src]="posterImageSrc">
+        <div class="detail-wrapper">
+          <div class="detail-container">
+            <div class="title">
+              <p>{{movie.title}}</p>
+            </div>
+            <p class="text-label small">Release date:<span class="release-text">{{movie.release}}</span></p>
+            <p class="text-label small">Users rating:<span class="marker-text">{{movie.rating}}</span> ({{movie.numOfVotes}})</p>
+            <p class="text-label small">Original language:<span class="marker-text">{{movie.language}}</span></p>
+            <p class="text-label categories">
+              Categories:
+              <span *ngFor="let catergory of movie.categories" class="category-text">{{catergory.name}}</span>
+            </p>
+            <div class="action-wrapper">
+              <div class="actions">
+                <app-movie-marker [(movie)]="movie"></app-movie-marker>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="description">
+    <img class="poster min-size-poster" [src]="posterImageSrc">
+    <p class="text-label large">{{movie.description}}</p>
+  </div>
+  <div class="video-container" >
+    <ng-container *ngFor="let video of movie.videos">
+      <iframe class="video" *ngIf="video.site==='YouTube' && video.type==='Trailer'" frameborder="0" allowfullscreen
+            [src]="getYoutubeUrl(video.key)">
+      </iframe>
+    </ng-container>
+  </div>
+  <div class="actors-container">
+    <div *ngFor="let actor of movie.characters" class="actor">
+      <img class="actor-image" [src]="imageBaseUrl + 'w185' + actor.profileImage">
+      <p class="actor-name">{{actor.name}}</p>
+      <p class="actor-character">{{actor.character}}</p>
+    </div>
+  </div>
+
+</div>

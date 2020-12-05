@@ -9,6 +9,8 @@ import {
 import { Observable, Subject, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { SelectedMovieService } from 'src/app/services/selected-movie.service';
 
 @Component({
   selector: 'app-movie-card',
@@ -21,7 +23,6 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   public imagePath: string;
   public release: string;
   private imageSize = 'w185';
-  private snackBarAction = 'OK';
 
   public favoriteSubscription: Subscription;
   public alreadySeenSubscription: Subscription;
@@ -30,7 +31,8 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   constructor(
     public movieService: MovieService,
     private storageService: StorageService,
-    private snackBar: MatSnackBar
+    private selectedMovieService: SelectedMovieService,
+    private router: Router
   ) {}
 
   ngOnDestroy(): void {
@@ -78,60 +80,14 @@ export class MovieCardComponent implements OnInit, OnDestroy {
     this.release = this.movie.release.slice(0, 4);
   }
 
-  public changeFavorite() {
-    const snackText =  this.movie.favorite ? 'You removed the movie from the list!' : 'You added the movie to your favorites!';
-    this.snackBar.open(
-      snackText,
-      this.snackBarAction,
-      {
-        duration: 2000,
-      }
-    );
-    this.movie.favorite = !this.movie.favorite;
-    if (this.movie.favorite) {
-      this.storageService.addFavorite(this.movie);
-    } else {
-      this.storageService.removeFavorite(this.movie);
-    }
-  }
-
-  public changeAlreadySeen() {
-    const snackText =  this.movie.alreadySeen ? 'You removed the movie from the list!' : 'You marked the movie as already seen!';
-    this.snackBar.open(
-      snackText,
-      this.snackBarAction,
-      {
-        duration: 2000,
-      }
-    );
-    this.movie.alreadySeen = !this.movie.alreadySeen;
-    if (this.movie.alreadySeen) {
-      this.storageService.addAlreadySeen(this.movie);
-    } else {
-      this.storageService.removeAlreadySeen(this.movie);
-    }
-  }
-
-  public changeWatchList() {
-    const snackText =  this.movie.watchlist ? 'You removed the movie from the list!' : 'You added the movie on your watchlist!';
-    this.snackBar.open(
-      snackText,
-      this.snackBarAction,
-      {
-        duration: 2000,
-      }
-    );
-    this.movie.watchlist = !this.movie.watchlist;
-    if (this.movie.watchlist) {
-      this.storageService.addOnWatchlist(this.movie);
-    } else {
-      this.storageService.removeFromWatchlist(this.movie);
-    }
-  }
-
   public getActorsDependsOnWindowSize(): Cast[] {
     return window.innerWidth < 500
       ? this.movie.characters.slice(0, 2)
       : this.movie.characters;
+  }
+
+  public navigateToDetails(): void {
+    this.selectedMovieService.selectMovie(this.movie);
+    this.router.navigate(['/movie-details']);
   }
 }

@@ -3,8 +3,8 @@ export interface Movie {
   title: string;
   image: string;
   backImage?: string;
-  video?: string;
-  descreption: string;
+  videos?: MovieVideo[];
+  description: string;
   rating: number;
   release: string;
   categories: Category[];
@@ -12,6 +12,8 @@ export interface Movie {
   favorite: boolean;
   alreadySeen: boolean;
   watchlist: boolean;
+  numOfVotes: number;
+  language: string;
 }
 
 export interface Cast {
@@ -26,3 +28,12 @@ export interface Category {
   id: number;
   name: string;
 }
+
+export interface MovieVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+}
+

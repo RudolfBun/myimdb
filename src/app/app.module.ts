@@ -20,6 +20,8 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 
 import { environment } from 'src/environments/environment';
+import { MovieDetailComponent } from './movie-detail/movie-detail.component';
+import { MovieMarkerComponent } from './shared/movie-marker/movie-marker.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
@@ -32,6 +34,8 @@ import { CookieService } from 'ngx-cookie-service';
     SearchBarComponent,
     MovieCardComponent,
     MarkedMoviesComponent,
+    MovieDetailComponent,
+    MovieMarkerComponent,
   ],
   imports: [
     BrowserModule,
