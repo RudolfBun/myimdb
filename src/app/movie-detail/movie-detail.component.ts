@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeStyle, SafeUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { Movie } from '../models/movie';
@@ -14,8 +14,7 @@ import { ApiUrlStrings } from '../utils/api-url-strings';
 export class MovieDetailComponent {
   public movie: Movie;
   public readonly imageBaseUrl = ApiUrlStrings.IMAGE_BASE_URL;
-  public backDropImageStyleProperty: string;
-  public posterImageSrc: string;
+  public backDropImageStyleProperty: SafeStyle;
 
   constructor(
     public readonly selectedMovie: SelectedMovieService,
@@ -27,8 +26,11 @@ export class MovieDetailComponent {
         this.router.navigate(['/home']);
       }
       this.movie = movie;
-      this.backDropImageStyleProperty = `url('${this.imageBaseUrl}w1280${this.movie.backImage}')`;
-      this.posterImageSrc = this.imageBaseUrl + 'w500' + this.movie.image;
+      this.backDropImageStyleProperty = this.movie.backImage
+        ? this.sanitizer.bypassSecurityTrustStyle(
+            `url('${this.movie.backImage}')`
+          )
+        : 'url()';
     });
   }
 

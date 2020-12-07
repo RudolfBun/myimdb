@@ -1,8 +1,8 @@
 <div class="content" *ngIf="movie">
-  <div class="background-image" [ngStyle]="{'background-image': backDropImageStyleProperty}">
+  <div class="background-image" [style.background-image]="backDropImageStyleProperty">
     <div class="image-cover">
       <div class="container">
-        <img class="poster" [src]="posterImageSrc">
+        <img class="poster" [src]="movie.image ? movie.image : '../../assets/profile.png'">
         <div class="detail-wrapper">
           <div class="detail-container">
             <div class="title">
@@ -26,7 +26,7 @@
     </div>
   </div>
   <div class="description">
-    <img class="poster min-size-poster" [src]="posterImageSrc">
+    <img class="poster min-size-poster" [src]="movie.image ? movie.image : '../../assets/profile.png'">
     <p class="text-label large">{{movie.description}}</p>
   </div>
   <div class="video-container" >
@@ -38,7 +38,7 @@
   </div>
   <div class="actors-container">
     <div *ngFor="let actor of movie.characters" class="actor">
-      <img class="actor-image" [src]="imageBaseUrl + 'w185' + actor.profileImage">
+      <img class="actor-image" [src]="actor.profileImage ? actor.profileImage : '../../assets/profile.png'">
       <p class="actor-name">{{actor.name}}</p>
       <p class="actor-character">{{actor.character}}</p>
     </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Cast, Movie } from 'src/app/models/movie';
 import { ApiUrlStrings } from 'src/app/utils/api-url-strings';
-import { MovieService } from 'src/app/services/movie.service';
+import { OnlineMovieService } from 'src/app/services/online-movie.service';
 import {
   StorageService,
   StoredMovieData,
@@ -20,14 +20,12 @@ import { SelectedMovieService } from 'src/app/services/selected-movie.service';
 export class MovieCardComponent implements OnInit, OnDestroy {
   @Input() movie: Movie;
   public readonly imageBaseUrl = ApiUrlStrings.IMAGE_BASE_URL;
-  public imagePath: string;
   public release: string;
-  private imageSize = 'w185';
 
   public movieMarkerSubscription: Subscription;
 
   constructor(
-    public movieService: MovieService,
+    public movieService: OnlineMovieService,
     private storageService: StorageService,
     private selectedMovieService: SelectedMovieService,
     private router: Router
@@ -38,12 +36,6 @@ export class MovieCardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.movie.image) {
-      this.imagePath = this.imageBaseUrl + this.imageSize + this.movie.image;
-    } else {
-      this.imagePath = '../../../assets/not-found.png';
-    }
-
     this.movieMarkerSubscription = this.storageService
       .getMovieState(this.movie.id)
       .subscribe((movieMarker) => {

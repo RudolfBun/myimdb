@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MovieService } from '../services/movie.service';
+import { OnlineMovieService } from '../services/online-movie.service';
 import { Observable } from 'rxjs';
 import { Movie } from '../models/movie';
 import { StorageService, StoredMovieData } from '../services/storage.service';
@@ -25,7 +25,7 @@ export class MarkedMoviesComponent implements OnInit {
   public title: string;
 
   constructor(
-    public movieService: MovieService,
+    public movieService: OnlineMovieService,
     public storageService: StorageService,
     private route: ActivatedRoute
   ) {}

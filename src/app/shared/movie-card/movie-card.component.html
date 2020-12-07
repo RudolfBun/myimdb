@@ -13,7 +13,7 @@
       <div>
 
       </div>
-      <img [src]="imagePath" class="image" (click)="navigateToDetails()" />
+      <img [src]="movie.image ? movie.image : '../../../assets/not-found.png'" class="image" (click)="navigateToDetails()" />
       <div class="description" fxLayout="column" fxLayoutAlign="space-around none">
         <div class="details">
           <p class="details-text">
@@ -37,6 +37,6 @@
         </div>
       </div>
     </div>
-      <app-movie-marker [(movie)]="movie"></app-movie-marker>
+    <app-movie-marker  class="actions" [(movie)]="movie"></app-movie-marker>
   </div>
 </mat-card>

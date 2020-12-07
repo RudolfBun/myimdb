@@ -17,8 +17,9 @@ import { isEmpty, map, startWith, switchMap } from 'rxjs/operators';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { SearchResult } from 'src/app/models/search-result';
-import { MovieService } from 'src/app/services/movie.service';
+import { OnlineMovieService } from 'src/app/services/online-movie.service';
 import { Category } from 'src/app/models/movie';
+import { MovieService } from 'src/app/services/movie.service';
 
 @Component({
   selector: 'app-search-bar',
@@ -52,14 +53,14 @@ export class SearchBarComponent implements OnDestroy {
   @ViewChild('auto') public matAutocomplete: MatAutocomplete;
 
   constructor(private movieService: MovieService) {
-    this.oprionsSubscription = this.movieService
-      .getAllCategory()
-      .subscribe((data) => {
+    this.oprionsSubscription = this.movieService.allCategory$.subscribe(
+      (data) => {
         this.allCategory = data;
         data.forEach((cat) => {
           this.allOptions.push(cat.name);
         });
-      });
+      }
+    );
     this.yearRegExp = new RegExp(this.YEAR_REGEX);
     this.year = false;
     this.inputPlaceholder = this.PLACEHORDER_BEFORE;
