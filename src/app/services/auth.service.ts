@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/user.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 @Injectable({
@@ -11,12 +11,18 @@ export class AuthService {
   public readonly users$: Observable<User[]>;
 
   constructor(private fireStore: AngularFirestore) {
-    this.users$ = this.fireStore.collection<User>('Users').valueChanges();
+    const localUser = localStorage.getItem('myImdb_user');
+    this.user = localUser ? ({ username: localUser } as User) : undefined;
+    if (navigator.onLine) {
+      this.users$ = this.fireStore.collection<User>('Users').valueChanges();
+    } else {
+      this.user = { username: 'admin', password: 'admin' };
+      this.users$ = of([this.user]);
+    }
   }
 
   public isAuth(): boolean {
-    return true;
-    /*  return this.user != null; */
+    return this.user != null || !!localStorage.getItem('myImdb_user');
   }
 
   public addUser(user: User) {
@@ -35,9 +41,11 @@ export class AuthService {
 
   public setUser(user: User) {
     this.user = user;
+    localStorage.setItem('myImdb_user', user.username);
   }
 
   public logout() {
     this.user = null;
+    localStorage.removeItem('myImdb_user');
   }
 }

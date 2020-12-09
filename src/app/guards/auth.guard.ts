@@ -13,7 +13,7 @@ import { AuthService } from '../services/auth.service';
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(router: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate() {
     if (this.authService.isAuth()) {
       return true;
     } else {
