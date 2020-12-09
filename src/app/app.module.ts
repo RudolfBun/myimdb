@@ -23,6 +23,7 @@ import { environment } from 'src/environments/environment';
 import { MovieDetailComponent } from './movie-detail/movie-detail.component';
 import { MovieMarkerComponent } from './shared/movie-marker/movie-marker.component';
 import { CookieService } from 'ngx-cookie-service';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { CookieService } from 'ngx-cookie-service';
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule.enablePersistence(),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],
