@@ -14,7 +14,17 @@
           "/*.js"
         ]
       }
-    }, {
+    },
+    {
+      "name": "profile",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/profile.png"
+        ]
+      }
+    },
+    {
       "name": "assets",
       "installMode": "lazy",
       "updateMode": "prefetch",
