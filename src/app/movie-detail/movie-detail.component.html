@@ -2,7 +2,7 @@
   <div class="background-image" [style.background-image]="backDropImageStyleProperty">
     <div class="image-cover">
       <div class="container">
-        <img class="poster" [src]="movie.image ? movie.image : '../../assets/profile.png'">
+        <img class="poster" [src]="isBase64Image(movie.image) ? movie.image : '../../assets/not-found.png'">
         <div class="detail-wrapper">
           <div class="detail-container">
             <div class="title">
@@ -26,10 +26,10 @@
     </div>
   </div>
   <div class="description">
-    <img class="poster min-size-poster" [src]="movie.image ? movie.image : '../../assets/profile.png'">
+    <img class="poster min-size-poster" [src]="isBase64Image(movie.image) ? movie.image : '../../assets/not-found.png'">
     <p class="text-label large">{{movie.description}}</p>
   </div>
-  <div class="video-container" >
+  <div class="video-container" *ngIf="isOnline()">
     <ng-container *ngFor="let video of movie.videos">
       <iframe class="video" *ngIf="video.site==='YouTube' && video.type==='Trailer'" frameborder="0" allowfullscreen
             [src]="getYoutubeUrl(video.key)">
@@ -38,7 +38,7 @@
   </div>
   <div class="actors-container">
     <div *ngFor="let actor of movie.characters" class="actor">
-      <img class="actor-image" [src]="actor.profileImage ? actor.profileImage : '../../assets/profile.png'">
+      <img class="actor-image" [src]="isBase64Image(actor.profileImage) ? actor.profileImage : '../../assets/profile.png'">
       <p class="actor-name">{{actor.name}}</p>
       <p class="actor-character">{{actor.character}}</p>
     </div>

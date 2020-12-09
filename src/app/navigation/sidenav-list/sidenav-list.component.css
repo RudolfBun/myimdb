@@ -1,3 +1,11 @@
 .full-width {
   width: 100%;
 }
+
+.active{
+  background: #689f38a3;
+}
+
+.active:hover{
+  background: #689f38a3;
+}

@@ -5,7 +5,7 @@
     </div>
     <div fxLayout="row" fxLayoutAlign="space-between center" class="rating-containter">
       <p>{{movie.rating}} </p>
-      <mat-icon color="primary">favorite</mat-icon>
+      <mat-icon color="accent">favorite</mat-icon>
     </div>
   </div>
   <div #container class="card-body">
@@ -13,7 +13,7 @@
       <div>
 
       </div>
-      <img [src]="movie.image ? movie.image : '../../../assets/not-found.png'" class="image" (click)="navigateToDetails()" />
+      <img [src]="isBase64Image(movie.image) ? movie.image : '../../../assets/not-found.png'" class="image" (click)="navigateToDetails()" />
       <div class="description" fxLayout="column" fxLayoutAlign="space-around none">
         <div class="details">
           <p class="details-text">
@@ -21,7 +21,7 @@
           </p>
         </div>
         <div class="category-container">
-          <mat-chip color="primary" selected>{{release}}</mat-chip>
+          <mat-chip color="accent" selected>{{release}}</mat-chip>
           <ng-container *ngFor="let category of movie.categories">
             <mat-chip>{{category.name}}</mat-chip>
           </ng-container>

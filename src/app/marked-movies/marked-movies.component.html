@@ -7,7 +7,7 @@
       <mat-form-field  style="width: 50%;" appearance="outline">
         <input matInput placeholder="Filter by title..." [formControl]="filterForm">
       </mat-form-field>
-      <button type="submit" class="btn-arround-margin" mat-raised-button color="primary" (click)="filterMovies()">Search</button>
+      <button type="submit" class="btn-arround-margin" mat-raised-button color="accent" (click)="filterMovies()">Search</button>
     </div>
   <ng-container *ngIf="movies.length > 0; else notSelectedContent">
     <div fxLayout="column" fxLayoutAlign="space-around center"

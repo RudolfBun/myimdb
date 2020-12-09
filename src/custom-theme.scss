@@ -12,11 +12,11 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$myImdb-primary: mat-palette($mat-indigo);
-$myImdb-accent: mat-palette($mat-pink, A200, A100, A400);
+$myImdb-primary: mat-palette($mat-light-green, 700);
+$myImdb-accent: mat-palette($mat-light-blue, 500);
 
 // The warn palette is optional (defaults to red).
-$myImdb-warn: mat-palette($mat-red);
+$myImdb-warn: mat-palette($mat-indigo);
 
 // Create the theme object (a Sass map containing all of the palettes).
 $myImdb-theme: mat-light-theme($myImdb-primary, $myImdb-accent, $myImdb-warn);

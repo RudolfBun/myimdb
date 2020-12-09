@@ -34,6 +34,14 @@ export class MovieDetailComponent {
     });
   }
 
+  public isOnline(): boolean {
+    return navigator.onLine;
+  }
+
+  public isBase64Image(image: string): boolean {
+    return !!image && !image.startsWith('/');
+  }
+
   public getYoutubeUrl(key: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(
       'https://www.youtube.com/embed/' + key

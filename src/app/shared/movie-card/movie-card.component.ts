@@ -54,6 +54,12 @@ export class MovieCardComponent implements OnInit, OnDestroy {
 
   public navigateToDetails(): void {
     this.selectedMovieService.selectMovie(this.movie);
+    console.log(this.movie);
+
     this.router.navigate(['/movie-details']);
+  }
+
+  public isBase64Image(image: string): boolean {
+    return !!image && !image.startsWith('/');
   }
 }

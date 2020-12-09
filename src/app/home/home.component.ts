@@ -23,4 +23,8 @@ export class HomeComponent {
   public search(result: SearchResult): void {
     this.movies$ = this.movieService.searchMovies(result);
   }
+
+  public isOnline(): boolean {
+    return navigator.onLine;
+  }
 }

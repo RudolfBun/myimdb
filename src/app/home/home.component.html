@@ -18,12 +18,22 @@
   </div>
 </ng-container>
 <ng-template #noResult>
-  <div class="no-result-wrapper">
-    <div class="no-result-container">
-      <p class="no-result-title">Hmmm..</p>
-      <p> We couldn't find any matches for this result :(</p>
+  <ng-container *ngIf="isOnline(); else noConnection">
+    <div class="no-result-wrapper">
+      <div class="no-result-container">
+        <p class="no-result-title">Hmmm..</p>
+        <p> We couldn't find any matches for this result :(</p>
+      </div>
     </div>
-  </div>
+  </ng-container>
+  <ng-template #noConnection>
+      <div class="no-result-wrapper">
+        <div class="no-result-container">
+          <p class="no-result-title">Hmmm..</p>
+          <p> There is no connection! :(</p>
+        </div>
+      </div>
+  </ng-template>
 </ng-template>
 </div>
 

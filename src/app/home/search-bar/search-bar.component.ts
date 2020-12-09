@@ -142,7 +142,7 @@ export class SearchBarComponent implements OnDestroy {
     const filterValue = category.toLowerCase();
 
     return this.allOptions.filter(
-      (fruit) => fruit.toLowerCase().indexOf(filterValue) === 0
+      (option) => option.toLowerCase().indexOf(filterValue) === 0
     );
   }
 
