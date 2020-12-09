@@ -6,7 +6,7 @@ import { StorageService, StoredMovieData } from '../services/storage.service';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouteStrings } from '../utils/route-strings';
-import { map, filter, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-marked-movies',

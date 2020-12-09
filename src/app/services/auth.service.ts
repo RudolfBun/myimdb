@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   public isAuth(): boolean {
-    return this.user != null || !!localStorage.getItem('myImdb_user');
+    return !!localStorage.getItem('myImdb_user');
   }
 
   public addUser(user: User) {

@@ -6,10 +6,10 @@ import { SearchResult } from '../models/search-result';
 import _ from 'lodash';
 import {
   defaultIfEmpty,
+  first,
   map,
   shareReplay,
   switchMap,
-  tap,
 } from 'rxjs/operators';
 import { Observable, combineLatest, forkJoin, of, zip } from 'rxjs';
 import { StorageService, StoredMovieData } from './storage.service';
@@ -123,21 +123,23 @@ export class OnlineMovieService {
         this.http.get(queryString),
       ]).pipe(
         map(([categories, data]) => {
-          if (data[this.RESULTS].length === 0) {
-            return [] as Movie[];
-          }
+          let result: Movie[];
           if (serach.category) {
-            return data[this.RESULTS].map((movie) => {
+            result = data[this.RESULTS].map((movie) => {
               const genres = movie.genre_ids as number[];
               if (genres.includes(serach.category.id)) {
                 return this.getMoivesFromResultArray(movie, categories, true);
               }
             }) as Movie[];
           } else {
-            return data[this.RESULTS].map((movie) => {
+            result = data[this.RESULTS].map((movie) => {
               return this.getMoivesFromResultArray(movie, categories, true);
             }) as Movie[];
           }
+          if (result.filter(Boolean).length === 0) {
+            return [];
+          }
+          return result;
         }),
         switchMap((movies) => {
           if (movies.length === 0) {
@@ -255,11 +257,13 @@ export class OnlineMovieService {
                         ApiUrlStrings.API_KEY
                     ).pipe(
                       switchMap((mo) => this.setMoviePosterToBase64(mo)),
-                      tap((m) =>
+                      map((m) => {
                         this.webStoreService
                           .saveMovie(m)
-                          .pipe(defaultIfEmpty(undefined))
-                      )
+                          .pipe(defaultIfEmpty(undefined), first())
+                          .subscribe();
+                        return m;
+                      })
                     );
                   } else {
                     of(undefined);
@@ -352,7 +356,14 @@ export class OnlineMovieService {
     return this.webStoreService.getMovie(movie.id).pipe(
       switchMap((mov) => {
         if (!navigator.onLine) {
-          return mov ? of(mov) : of(movie);
+          return mov
+            ? of({
+                ...mov,
+                favorite: movie.favorite,
+                alreadySeen: movie.alreadySeen,
+                watchlist: movie.watchlist,
+              })
+            : of(movie);
         }
         if (
           mov === undefined ||
@@ -365,9 +376,13 @@ export class OnlineMovieService {
             switchMap((videos) => of({ ...movie, videos })),
             switchMap((m) => this.setMovieBackImageToBase64(m)),
             switchMap((m) => this.preloadAllProfilePictures(m)),
-            tap((m) =>
-              this.webStoreService.saveMovie(m).pipe(defaultIfEmpty(undefined))
-            )
+            map((m) => {
+              this.webStoreService
+                .saveMovie(m)
+                .pipe(defaultIfEmpty(undefined), first())
+                .subscribe();
+              return m;
+            })
           );
         } else {
           return of(movie);

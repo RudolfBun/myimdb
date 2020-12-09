@@ -4,12 +4,12 @@ import { Movie, MovieMarker } from '../models/movie';
 import { AuthService } from './auth.service';
 import {
   defaultIfEmpty,
+  first,
   map,
   shareReplay,
   switchMap,
-  tap,
 } from 'rxjs/operators';
-import { Observable, of, combineLatest, concat } from 'rxjs';
+import { Observable, of, combineLatest } from 'rxjs';
 import { WebStoreService } from './web-store.service';
 
 export interface StoredMovieData {
@@ -83,40 +83,40 @@ export class StorageService {
   }
 
   addFavorite(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_FAVORITES);
+    this.updateIndexDBMarkers(movie);
 
     const data = this.createStoredMovieData(movie);
     return this.addToDatabase(this.COLL_FAVORITES, movie.id, data);
   }
 
   removeFavorite(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_FAVORITES);
+    this.updateIndexDBMarkers(movie);
 
     return this.removeFromDatabes(this.COLL_FAVORITES, movie.id);
   }
 
   addAlreadySeen(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_ALREADY_SEEN);
+    this.updateIndexDBMarkers(movie);
 
     const data = this.createStoredMovieData(movie);
     return this.addToDatabase(this.COLL_ALREADY_SEEN, movie.id, data);
   }
 
   removeAlreadySeen(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_ALREADY_SEEN);
+    this.updateIndexDBMarkers(movie);
 
     return this.removeFromDatabes(this.COLL_ALREADY_SEEN, movie.id);
   }
 
   addOnWatchlist(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_WATCHLIST);
+    this.updateIndexDBMarkers(movie);
 
     const data = this.createStoredMovieData(movie);
     return this.addToDatabase(this.COLL_WATCHLIST, movie.id, data);
   }
 
   removeFromWatchlist(movie: Movie) {
-    this.updateIndexDBMarkers(movie, this.COLL_WATCHLIST);
+    this.updateIndexDBMarkers(movie);
 
     return this.removeFromDatabes(this.COLL_WATCHLIST, movie.id);
   }
@@ -148,13 +148,12 @@ export class StorageService {
           alreadySeen,
           onWatchList,
         } as MovieMarker;
+        this.webStoreService
+          .saveMovieMarker(id, movieMarker)
+          .pipe(defaultIfEmpty(undefined), first())
+          .subscribe();
         return of(movieMarker);
       }),
-      tap((marker) =>
-        this.webStoreService
-          .saveMovieMarker(id, marker)
-          .pipe(defaultIfEmpty(undefined))
-      ),
       shareReplay(1)
     );
   }
@@ -167,16 +166,16 @@ export class StorageService {
     } as StoredMovieData;
   }
 
-  private updateIndexDBMarkers(movie: Movie, collection: string): void {
-    concat(
+  private updateIndexDBMarkers(movie: Movie): void {
+    combineLatest([
       this.webStoreService.saveMovieMarker(movie.id, {
         favorite: movie.favorite,
         alreadySeen: movie.alreadySeen,
         onWatchList: movie.watchlist,
       }),
-      this.webStoreService.saveMovie(movie)
-    )
-      .pipe(defaultIfEmpty(undefined))
+      this.webStoreService.saveMovie(movie),
+    ])
+      .pipe(defaultIfEmpty(undefined), first())
       .subscribe();
   }
 }

@@ -1,10 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SearchResult } from '../models/search-result';
-import { OnlineMovieService } from '../services/online-movie.service';
 import { Movie } from '../models/movie';
-import { StorageService } from '../services/storage.service';
 import { Subscription, Observable, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
 import { MovieService } from '../services/movie.service';
 
 @Component({

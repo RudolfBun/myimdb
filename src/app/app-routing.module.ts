@@ -7,7 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { MovieDetailComponent } from './movie-detail/movie-detail.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   {
@@ -38,7 +38,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -2,13 +2,8 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Cast, Movie } from 'src/app/models/movie';
 import { ApiUrlStrings } from 'src/app/utils/api-url-strings';
 import { OnlineMovieService } from 'src/app/services/online-movie.service';
-import {
-  StorageService,
-  StoredMovieData,
-} from 'src/app/services/storage.service';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { StorageService } from 'src/app/services/storage.service';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SelectedMovieService } from 'src/app/services/selected-movie.service';
 
@@ -54,8 +49,6 @@ export class MovieCardComponent implements OnInit, OnDestroy {
 
   public navigateToDetails(): void {
     this.selectedMovieService.selectMovie(this.movie);
-    console.log(this.movie);
-
     this.router.navigate(['/movie-details']);
   }
 

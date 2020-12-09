@@ -1,18 +1,15 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, concat, Observable, of, zip } from 'rxjs';
+import { combineLatest, Observable, of, zip } from 'rxjs';
 import {
   defaultIfEmpty,
+  first,
   map,
   shareReplay,
   switchMap,
-  tap,
 } from 'rxjs/operators';
 import { Cast, Category, Movie } from '../models/movie';
 import { SearchResult } from '../models/search-result';
-import { ApiUrlStrings } from '../utils/api-url-strings';
-import { ImageService } from './image.service';
 import { OnlineMovieService } from './online-movie.service';
-import { StoredMovieData } from './storage.service';
 import { WebStoreService } from './web-store.service';
 
 @Injectable({
@@ -80,14 +77,18 @@ export class MovieService {
           return zip(...movies);
         } else if (navigator.onLine) {
           return this.onlineMovieService.topRatedMovies$.pipe(
-            tap((movies) =>
-              concat(
+            switchMap((movies) => {
+              combineLatest([
                 this.webStoreService.saveMovies(movies),
                 this.webStoreService.saveTopRatedMovieIds(
                   movies.map(({ id }) => id)
-                )
-              ).pipe(defaultIfEmpty(undefined))
-            )
+                ),
+              ])
+                .pipe(defaultIfEmpty(undefined), first())
+                .subscribe();
+
+              return of(movies);
+            })
           );
         } else {
           return of(undefined);
