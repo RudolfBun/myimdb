@@ -1,18 +1,8 @@
 import { Injectable } from '@angular/core';
-import {
-  combineLatest,
-  concat,
-  forkJoin,
-  merge,
-  Observable,
-  of,
-  zip,
-} from 'rxjs';
+import { combineLatest, concat, Observable, of, zip } from 'rxjs';
 import {
   defaultIfEmpty,
-  delayWhen,
   map,
-  mergeMap,
   shareReplay,
   switchMap,
   tap,
@@ -37,7 +27,7 @@ export class MovieService {
     private readonly onlineMovieService: OnlineMovieService
   ) {
     this.allCategory$ = this.getAllCategory().pipe(shareReplay(1));
-    this.topRatedMovies$ = this.getTopRatedMovies().pipe(shareReplay(1));
+    this.topRatedMovies$ = this.getTopRatedMovies() /* .pipe(shareReplay(1)) */;
   }
 
   public getAllCategory(): Observable<Category[]> {
@@ -59,18 +49,38 @@ export class MovieService {
   }
 
   private getTopRatedMovies(): Observable<Movie[]> {
-    return this.webStoreService.getTopRatedMovieIds().pipe(
-      switchMap((tops) => {
+    return combineLatest([
+      this.webStoreService.getTopRatedMovieIds(),
+      this.webStoreService.getMovieMarkers(),
+    ]).pipe(
+      switchMap(([tops, markers]) => {
         if (tops?.length > 0) {
           const movies: Observable<Movie>[] = [];
           tops.sort((m1, m2) => m1.order - m2.order);
           tops.forEach((top) =>
-            movies.push(this.webStoreService.getMovie(top.id))
+            movies.push(
+              this.webStoreService.getMovie(top.id).pipe(
+                switchMap((movie) => {
+                  const marker = markers.find(
+                    (mark) => mark.movieId === movie.id
+                  );
+                  if (marker) {
+                    return of({
+                      ...movie,
+                      favorite: marker.markers.favorite,
+                      alreadySeen: marker.markers.alreadySeen,
+                      watchlist: marker.markers.onWatchList,
+                    });
+                  }
+                  return of(movie);
+                })
+              )
+            )
           );
           return zip(...movies);
         } else if (navigator.onLine) {
           return this.onlineMovieService.topRatedMovies$.pipe(
-            delayWhen((movies) =>
+            tap((movies) =>
               concat(
                 this.webStoreService.saveMovies(movies),
                 this.webStoreService.saveTopRatedMovieIds(

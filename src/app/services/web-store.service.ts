@@ -15,7 +15,7 @@ export class WebStoreService {
   private readonly categoriesStoreName = 'categories';
   private readonly movieMarkerStoreName = 'movieMarks';
 
-  constructor(private readonly imageService: ImageService) {
+  constructor() {
     this.initDb();
   }
 
@@ -234,7 +234,7 @@ export class WebStoreService {
     );
   }
 
-  public getMovieMarker(): Observable<
+  public getMovieMarkers(): Observable<
     { movieId: number; markers: MovieMarker }[]
   > {
     return this.db$.pipe(
@@ -254,7 +254,7 @@ export class WebStoreService {
                   if (m) {
                     result.push({
                       movieId: cursor.key,
-                      markers: m.value,
+                      markers: m,
                     } as { movieId: number; markers: MovieMarker });
                   }
                   cursor.continue();
@@ -267,6 +267,26 @@ export class WebStoreService {
               return () => transaction?.abort();
             }
           )
+      )
+    );
+  }
+
+  public getMoviMarkerForOneMovie(movieId: number): Observable<MovieMarker> {
+    return this.db$.pipe(
+      switchMap(
+        (db) =>
+          new Observable<MovieMarker>((subscriber) => {
+            let transaction = db.transaction(this.movieMarkerStoreName);
+            const request = transaction
+              .objectStore(this.movieMarkerStoreName)
+              .get(movieId);
+            transaction.oncomplete = () => {
+              transaction = null;
+              subscriber.next(request.result);
+              subscriber.complete();
+            };
+            return () => transaction?.abort();
+          })
       )
     );
   }

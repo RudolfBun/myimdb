@@ -14,6 +14,6 @@ export class SelectedMovieService {
   }
 
   public selectMovie(movie: Movie) {
-    this.selectedMovie$ = this.movieService.extendMovieWithVideoKey(movie);
+    this.selectedMovie$ = this.movieService.extendMovieData(movie);
   }
 }

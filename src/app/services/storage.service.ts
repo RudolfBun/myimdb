@@ -1,25 +1,15 @@
 import { Injectable } from '@angular/core';
-import {
-  AngularFirestore,
-  DocumentChangeAction,
-  AngularFirestoreCollection,
-} from '@angular/fire/firestore';
-import { User } from '../models/user.model';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Movie, MovieMarker } from '../models/movie';
 import { AuthService } from './auth.service';
 import {
   defaultIfEmpty,
-  delayWhen,
-  distinctUntilChanged,
-  filter,
   map,
   shareReplay,
   switchMap,
   tap,
 } from 'rxjs/operators';
-import { Observable, of, BehaviorSubject, combineLatest, concat } from 'rxjs';
-import { ApiUrlStrings } from '../utils/api-url-strings';
-import { MovieService } from './movie.service';
+import { Observable, of, combineLatest, concat } from 'rxjs';
 import { WebStoreService } from './web-store.service';
 
 export interface StoredMovieData {
@@ -43,7 +33,6 @@ export class StorageService {
   constructor(
     private fireStore: AngularFirestore,
     private authService: AuthService,
-    private movieService: MovieService,
     private webStoreService: WebStoreService
   ) {
     if (navigator.onLine) {
@@ -57,7 +46,7 @@ export class StorageService {
         .collection<StoredMovieData>(this.COLL_WATCHLIST)
         .valueChanges();
     } else {
-      this.favoriteMovies$ = this.webStoreService.getMovieMarker().pipe(
+      this.favoriteMovies$ = this.webStoreService.getMovieMarkers().pipe(
         map((markers) => {
           const movies = markers.filter(
             (mark) => mark.markers.favorite === true
@@ -68,7 +57,7 @@ export class StorageService {
           );
         })
       );
-      this.alreadySeenMovies$ = this.webStoreService.getMovieMarker().pipe(
+      this.alreadySeenMovies$ = this.webStoreService.getMovieMarkers().pipe(
         map((markers) => {
           const movies = markers.filter(
             (mark) => mark.markers.alreadySeen === true
@@ -79,7 +68,7 @@ export class StorageService {
           );
         })
       );
-      this.moviesOnWatchlist$ = this.webStoreService.getMovieMarker().pipe(
+      this.moviesOnWatchlist$ = this.webStoreService.getMovieMarkers().pipe(
         map((markers) => {
           const movies = markers.filter(
             (mark) => mark.markers.onWatchList === true
@@ -94,54 +83,54 @@ export class StorageService {
   }
 
   addFavorite(movie: Movie) {
-    if (navigator.onLine) {
-      const data = this.createStoredMovieData(movie);
-      return this.addToDatabase(this.COLL_FAVORITES, `${movie.id}`, data);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_FAVORITES);
+
+    const data = this.createStoredMovieData(movie);
+    return this.addToDatabase(this.COLL_FAVORITES, movie.id, data);
   }
 
   removeFavorite(movie: Movie) {
-    if (navigator.onLine) {
-      return this.removeFromDatabes(this.COLL_FAVORITES, `${movie.id}`);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_FAVORITES);
+
+    return this.removeFromDatabes(this.COLL_FAVORITES, movie.id);
   }
 
   addAlreadySeen(movie: Movie) {
-    if (navigator.onLine) {
-      const data = this.createStoredMovieData(movie);
-      return this.addToDatabase(this.COLL_ALREADY_SEEN, `${movie.id}`, data);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_ALREADY_SEEN);
+
+    const data = this.createStoredMovieData(movie);
+    return this.addToDatabase(this.COLL_ALREADY_SEEN, movie.id, data);
   }
 
   removeAlreadySeen(movie: Movie) {
-    if (navigator.onLine) {
-      return this.removeFromDatabes(this.COLL_ALREADY_SEEN, `${movie.id}`);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_ALREADY_SEEN);
+
+    return this.removeFromDatabes(this.COLL_ALREADY_SEEN, movie.id);
   }
 
   addOnWatchlist(movie: Movie) {
-    if (navigator.onLine) {
-      const data = this.createStoredMovieData(movie);
-      return this.addToDatabase(this.COLL_WATCHLIST, `${movie.id}`, data);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_WATCHLIST);
+
+    const data = this.createStoredMovieData(movie);
+    return this.addToDatabase(this.COLL_WATCHLIST, movie.id, data);
   }
 
   removeFromWatchlist(movie: Movie) {
-    if (navigator.onLine) {
-      return this.removeFromDatabes(this.COLL_WATCHLIST, `${movie.id}`);
-    }
+    this.updateIndexDBMarkers(movie, this.COLL_WATCHLIST);
+
+    return this.removeFromDatabes(this.COLL_WATCHLIST, movie.id);
   }
 
   private addToDatabase(
     collection: string,
-    key: string,
+    movieId: number,
     movie: StoredMovieData
   ) {
-    return this.fireStore.collection(collection).doc(key).set(movie);
+    return this.fireStore.collection(collection).doc(`${movieId}`).set(movie);
   }
 
-  private removeFromDatabes(collection: string, key: string) {
-    return this.fireStore.collection(collection).doc(key).delete();
+  private removeFromDatabes(collection: string, movieId: number) {
+    return this.fireStore.collection(collection).doc(`${movieId}`).delete();
   }
 
   public getMovieState(id: number): Observable<MovieMarker> {
@@ -161,7 +150,7 @@ export class StorageService {
         } as MovieMarker;
         return of(movieMarker);
       }),
-      delayWhen((marker) =>
+      tap((marker) =>
         this.webStoreService
           .saveMovieMarker(id, marker)
           .pipe(defaultIfEmpty(undefined))
@@ -176,5 +165,18 @@ export class StorageService {
       title: movie.title,
       username: this.authService.getUser.username,
     } as StoredMovieData;
+  }
+
+  private updateIndexDBMarkers(movie: Movie, collection: string): void {
+    concat(
+      this.webStoreService.saveMovieMarker(movie.id, {
+        favorite: movie.favorite,
+        alreadySeen: movie.alreadySeen,
+        onWatchList: movie.watchlist,
+      }),
+      this.webStoreService.saveMovie(movie)
+    )
+      .pipe(defaultIfEmpty(undefined))
+      .subscribe();
   }
 }

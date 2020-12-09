@@ -6,10 +6,10 @@ import { SearchResult } from '../models/search-result';
 import _ from 'lodash';
 import {
   defaultIfEmpty,
-  delayWhen,
   map,
   shareReplay,
   switchMap,
+  tap,
 } from 'rxjs/operators';
 import { Observable, combineLatest, forkJoin, of, zip } from 'rxjs';
 import { StorageService, StoredMovieData } from './storage.service';
@@ -45,13 +45,10 @@ export class OnlineMovieService {
     this.topRatedMovies$ = this.getTopRatedMovies().pipe(
       switchMap((movies) => {
         const newMovies = movies.map((movie) =>
-          this.setMovieImagesToBase64(movie)
+          this.setMoviePosterToBase64(movie)
         );
         return zip(...newMovies);
       }),
-      switchMap((movies) =>
-        zip(...movies.map((movie) => this.preloadAllProfilePictures(movie)))
-      ),
       shareReplay(1)
     );
   }
@@ -126,6 +123,9 @@ export class OnlineMovieService {
         this.http.get(queryString),
       ]).pipe(
         map(([categories, data]) => {
+          if (data[this.RESULTS].length === 0) {
+            return [] as Movie[];
+          }
           if (serach.category) {
             return data[this.RESULTS].map((movie) => {
               const genres = movie.genre_ids as number[];
@@ -140,22 +140,18 @@ export class OnlineMovieService {
           }
         }),
         switchMap((movies) => {
+          if (movies.length === 0) {
+            return of([]);
+          }
           const newMovies = movies.map((movie) =>
-            this.setMovieImagesToBase64(movie)
+            this.setMoviePosterToBase64(movie)
           );
           return zip(...newMovies);
         }),
-        switchMap((movies) =>
-          zip(
-            ...movies.map((movie) =>
-              this.preloadAllProfilePictures(movie as Movie)
-            )
-          )
-        ),
         shareReplay(1)
       );
     } else {
-      return of(undefined);
+      return of([]);
     }
   }
 
@@ -238,8 +234,6 @@ export class OnlineMovieService {
     );
   }
 
-  /* Ez ráppipol arra, hogy pl mi van a favoritesben, és lekéri erről az adatokat egyesével */
-  /* Itt meglethetne nézni, hogy az adott film benne van e az idexDB-be ha nincs akkor menjen ki a lekérdezés */
   public getContentRelatedMovies(
     markedMovies$: Observable<StoredMovieData[]>
   ): Observable<Movie[]> {
@@ -257,12 +251,11 @@ export class OnlineMovieService {
                   } else if (navigator.onLine) {
                     return this.getMoiveById(
                       ApiUrlStrings.GET_MOVIE_WITHOUT_KEY +
-                        mov.id +
+                        movie.id +
                         ApiUrlStrings.API_KEY
                     ).pipe(
-                      switchMap((mo) => this.setMovieImagesToBase64(mo)),
-                      switchMap((mo) => this.preloadAllProfilePictures(mo)),
-                      delayWhen((m) =>
+                      switchMap((mo) => this.setMoviePosterToBase64(mo)),
+                      tap((m) =>
                         this.webStoreService
                           .saveMovie(m)
                           .pipe(defaultIfEmpty(undefined))
@@ -280,56 +273,59 @@ export class OnlineMovieService {
     );
   }
 
-  public setMovieImagesToBase64(movie: Movie): Observable<Movie> {
+  public setMoviePosterToBase64(movie: Movie): Observable<Movie> {
     if (!movie) {
       return of(undefined);
     }
-    return combineLatest([
-      movie.backImage
-        ? this.imageService.preloadImage(
-            this.backImageBaseUrl + movie.backImage
-          )
-        : of(undefined),
-      movie.image
-        ? this.imageService.preloadImage(this.posterImageBaseUrl + movie.image)
-        : of(undefined),
-    ]).pipe(
-      map(
-        ([back, poster]) =>
-          ({
-            ...movie,
-            backImage: back,
-            image: poster,
-          } as Movie)
-      )
-    );
+    if (movie.image) {
+      return combineLatest([
+        this.imageService.preloadImage(this.posterImageBaseUrl + movie.image),
+      ]).pipe(map(([poster]) => ({ ...movie, image: poster } as Movie)));
+    }
+    return of(movie);
+  }
+
+  public setMovieBackImageToBase64(movie: Movie): Observable<Movie> {
+    if (!movie) {
+      return of(undefined);
+    }
+    if (movie.backImage && movie.backImage.startsWith('/')) {
+      return combineLatest([
+        this.imageService.preloadImage(this.backImageBaseUrl + movie.backImage),
+      ]).pipe(map(([backImage]) => ({ ...movie, backImage } as Movie)));
+    }
+    return of(movie);
   }
 
   public preloadAllProfilePictures(movie: Movie): Observable<Movie> {
     if (!movie) {
       return of(undefined);
     }
-    const chars$ = movie.characters.map((character) => {
-      if (character.profileImage) {
-        return this.imageService
-          .preloadImage(this.profileImageBaseUrl + character.profileImage)
-          .pipe(
-            map(
-              (image) =>
-                ({
-                  ...character,
-                  profileImage: image,
-                } as Cast)
-            )
-          );
-      } else {
-        return of(character);
-      }
-    });
-    const allchars$ = zip(...chars$);
-    return allchars$.pipe(
-      map((casts) => ({ ...movie, characters: casts } as Movie))
-    );
+    if (movie.characters.length > 0) {
+      const chars$ = movie.characters.map((character) => {
+        if (character.profileImage && character.profileImage.startsWith('/')) {
+          return this.imageService
+            .preloadImage(this.profileImageBaseUrl + character.profileImage)
+            .pipe(
+              map(
+                (image) =>
+                  ({
+                    ...character,
+                    profileImage: image,
+                  } as Cast)
+              )
+            );
+        } else {
+          return of(character);
+        }
+      });
+      const allchars$ = zip(...chars$);
+      return allchars$.pipe(
+        map((casts) => ({ ...movie, characters: casts } as Movie))
+      );
+    } else {
+      return of(movie);
+    }
   }
 
   private getMovieVideos(id: number): Observable<MovieVideo[]> {
@@ -352,15 +348,31 @@ export class OnlineMovieService {
     );
   }
 
-  public extendMovieWithVideoKey(movie: Movie): Observable<Movie> {
-    if (navigator.onLine) {
-      return this.getMovieVideos(movie.id).pipe(
-        switchMap((videos) => {
-          return of({ ...movie, videos });
-        })
-      );
-    } else {
-      return of(movie);
-    }
+  public extendMovieData(movie: Movie): Observable<Movie> {
+    return this.webStoreService.getMovie(movie.id).pipe(
+      switchMap((mov) => {
+        if (!navigator.onLine) {
+          return mov ? of(mov) : of(movie);
+        }
+        if (
+          mov === undefined ||
+          (mov?.backImage !== null && mov?.backImage.startsWith('/')) ||
+          mov?.characters
+            .filter((char) => char.profileImage === null)
+            .some((char) => char.profileImage.startsWith('/'))
+        ) {
+          return this.getMovieVideos(movie.id).pipe(
+            switchMap((videos) => of({ ...movie, videos })),
+            switchMap((m) => this.setMovieBackImageToBase64(m)),
+            switchMap((m) => this.preloadAllProfilePictures(m)),
+            tap((m) =>
+              this.webStoreService.saveMovie(m).pipe(defaultIfEmpty(undefined))
+            )
+          );
+        } else {
+          return of(movie);
+        }
+      })
+    );
   }
 }
