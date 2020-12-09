@@ -13,14 +13,14 @@
       <div>
 
       </div>
-      <img [src]="isBase64Image(movie.image) ? movie.image : '../../../assets/not-found.png'" class="image" (click)="navigateToDetails()" />
+      <img loading="lazy" [src]="isBase64Image(movie.image) ? movie.image : '../../../assets/not-found.png'" class="image" (click)="navigateToDetails()" />
       <div class="description" fxLayout="column" fxLayoutAlign="space-around none">
         <div class="details">
           <p class="details-text">
             {{movie.description}}
           </p>
         </div>
-        <div class="category-container">
+        <div *ngIf="movie.categories?.length > 0" class="category-container">
           <mat-chip color="accent" selected>{{release}}</mat-chip>
           <ng-container *ngFor="let category of movie.categories">
             <mat-chip>{{category.name}}</mat-chip>
@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    <div class="actors">
+    <div *ngIf="movie?.characters?.length > 0" class="actors">
       <p class="actors-header">Actors</p>
       <div class="actors-wrapper">
         <div class="actor-name-wrapper" *ngFor="let cast of getActorsDependsOnWindowSize()">
